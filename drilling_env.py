@@ -1,24 +1,22 @@
-import gymnasium as gym
-from gymnasium import spaces
-import numpy as np
-import os
-import pandas as pd
-from sklearn.preprocessing import MinMaxScaler  # Or StandardScaler
-
 class DrillingEnv(gym.Env):
     """Custom Environment for RL-based Drilling Optimization."""
 
-    metadata = {"render_modes": ["human"], "render_fps": 30} # For visualization (optional)
+    metadata = {"render_modes": ["human"], "render_fps": 30}  # For visualization (optional)
 
-    
+    def __init__(self, data_path=None):
+        super().__init__()
 
+        # Ensure file path is set correctly
         if data_path is None:
-            data_path = os.path.expanduser("~/Desktop/synthetic_drilling_data.csv")  # Ensure it works across OS
-            
+            data_path = os.path.expanduser("~/Desktop/synthetic_drilling_data.csv")  
+        
+        # Verify that the dataset exists before loading
         if not os.path.exists(data_path):
             raise FileNotFoundError(f"Dataset not found: {data_path}. Please verify the file location.")
-        
+
         self.df = pd.read_csv(data_path)
+
+        
 
 
         # 1. Feature and Target Selection
