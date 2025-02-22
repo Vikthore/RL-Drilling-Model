@@ -72,7 +72,7 @@ with st.sidebar:
 # --- Main Content Area ---
 if page == "🏠 Project Overview":
     st.title("🚀 Reinforcement Learning for Smart Drilling")
-    st.image("https://www.offshore-technology.com/wp-content/uploads/sites/13/2020/02/shutterstock_100825995.jpg", use_container_width=True)
+    st.image("tricone_bit.jpeg", use_container_width=True)
     st.write("""
         Welcome to the **AI-powered Drilling Optimization Dashboard**! 🌍🛢️
         
