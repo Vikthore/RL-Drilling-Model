@@ -13,15 +13,8 @@ class DrillingEnv(gym.Env):
     def __init__(self, data_path=None):
         super().__init__()
 
-        # Ensure file path is set correctly
-        if data_path is None:
-            data_path = os.path.expanduser("~/Desktop/synthetic_drilling_data.csv")  
         
-        # Verify that the dataset exists before loading
-        if not os.path.exists(data_path):
-            raise FileNotFoundError(f"Dataset not found: {data_path}. Please verify the file location.")
-
-        self.df = pd.read_csv(data_path)
+        self.df = pd.read_csv("synthetic_drilling_data.csv")
 
         # 1. Feature and Target Selection
         self.feature_columns = ['WOB', 'RPM', 'MW', 'FlowRate', 'Torque'] # Input features for state
