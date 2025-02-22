@@ -72,7 +72,7 @@ with st.sidebar:
 # --- Main Content Area ---
 if page == "🏠 Project Overview":
     st.title("Reinforcement Learning for Automated Drilling Control")
-    st.image("https://miro.medium.com/max/1400/1*5VQ14OCOm2JdFYPoRZdF7g.png", use_column_width=True)
+    st.image("https://miro.medium.com/max/1400/1*5VQ14OCOm2JdFYPoRZdF7g.png", use_container_width=True)
     st.write("This dashboard provides an interactive experience for monitoring and training RL models for drilling optimization.")
     
 elif page == "📈 Agent Performance":
