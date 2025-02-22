@@ -72,7 +72,7 @@ with st.sidebar:
 # --- Main Content Area ---
 if page == "🏠 Project Overview":
     st.title("🚀 Reinforcement Learning for Smart Drilling")
-    st.image("tricone_bit.jpeg", use_container_width=True)
+    st.image("oil_rig.jpeg", use_container_width=True)
     st.write("""
         Welcome to the **AI-powered Drilling Optimization Dashboard**! 🌍🛢️
         
