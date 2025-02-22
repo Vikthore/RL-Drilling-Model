@@ -1,6 +1,7 @@
 import gymnasium as gym
 from gymnasium import spaces
 import numpy as np
+import os
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler  # Or StandardScaler
 
@@ -9,10 +10,16 @@ class DrillingEnv(gym.Env):
 
     metadata = {"render_modes": ["human"], "render_fps": 30} # For visualization (optional)
 
-    def __init__(self, data_path='Desktop/synthetic_drilling_data.csv'):
-        super().__init__()
-        self.data_path = data_path
+    
+
+        if data_path is None:
+            data_path = os.path.expanduser("~/Desktop/synthetic_drilling_data.csv")  # Ensure it works across OS
+            
+        if not os.path.exists(data_path):
+            raise FileNotFoundError(f"Dataset not found: {data_path}. Please verify the file location.")
+        
         self.df = pd.read_csv(data_path)
+
 
         # 1. Feature and Target Selection
         self.feature_columns = ['WOB', 'RPM', 'MW', 'FlowRate', 'Torque'] # Input features for state
