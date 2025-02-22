@@ -87,11 +87,34 @@ if page == "🏠 Project Overview":
     """)
     st.video("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
     
-elif page == "📈 Agent Performance":
+# --- Agent Performance Evaluation ---
+if page == "📈 Agent Performance":
     st.header("Agent Performance Evaluation")
-    mean_reward = 146349.72
-    st.metric(label="🏆 Average Episode Reward", value=f"{mean_reward:.2f}")
+    st.subheader("Evaluate Trained RL Agent")
     
+    if st.button("🚀 Run Evaluation"):
+        with st.spinner("Evaluating the agent..."):
+            model = PPO.load("ppo_drilling_agent")
+            env = DrillingEnv()
+            episodes_to_evaluate = 10
+            mean_reward = 0
+            
+            for episode in range(episodes_to_evaluate):
+                obs, _ = env.reset()
+                done = False
+                episode_reward = 0
+                while not done:
+                    action, _ = model.predict(obs, deterministic=True)
+                    obs, reward, terminated, truncated, info = env.step(action)
+                    done = terminated or truncated
+                    episode_reward += reward
+                mean_reward += episode_reward
+                st.write(f"Episode {episode+1} Reward: {episode_reward}")
+            
+            mean_reward /= episodes_to_evaluate
+            st.success(f"🎯 Mean Reward over {episodes_to_evaluate} episodes: {mean_reward}")
+            env.close()
+
     st.subheader("Training Progress")
     training_iterations = np.linspace(10000, 100000, 10).astype(int)
     ep_rew_means = np.linspace(125000, 146349, 10).astype(int)
