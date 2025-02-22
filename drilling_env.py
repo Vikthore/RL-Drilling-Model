@@ -1,3 +1,10 @@
+import os
+import numpy as np
+import pandas as pd
+from sklearn.preprocessing import MinMaxScaler
+import gym
+from gym import spaces
+
 class DrillingEnv(gym.Env):
     """Custom Environment for RL-based Drilling Optimization."""
 
@@ -15,9 +22,6 @@ class DrillingEnv(gym.Env):
             raise FileNotFoundError(f"Dataset not found: {data_path}. Please verify the file location.")
 
         self.df = pd.read_csv(data_path)
-
-        
-
 
         # 1. Feature and Target Selection
         self.feature_columns = ['WOB', 'RPM', 'MW', 'FlowRate', 'Torque'] # Input features for state
@@ -43,7 +47,6 @@ class DrillingEnv(gym.Env):
         self.current_step = 0 # Track current step in episode
         self.max_steps_per_episode = len(self.df) # Example: Episode length = dataset size
 
-
     def reset(self, seed=None, options=None):
         """Reset the environment to the initial state."""
         super().reset(seed=seed, options=options)
@@ -61,25 +64,21 @@ class DrillingEnv(gym.Env):
         # Get current state (scaled features)
         current_state_scaled = self.scaled_features[self.current_step]
 
-        print("Action:", action) # Debug print: Action value
-        print("Current Scaled State:", current_state_scaled) # Debug print: Current scaled state
+        # Unscale the current state to apply the action
+        current_state_unscaled = self.feature_scaler.inverse_transform(current_state_scaled.reshape(1, -1)).flatten()
 
-        # Unscale action (adjustments in scaled space) and apply to scaled state
-        action_unscaled = action # For now, assuming action is already in scaled space.  Unscaling logic would go here if needed.
-        next_state_scaled = current_state_scaled + action_unscaled[:len(self.action_space.shape)] # Apply action to WOB, RPM, MW (first 3 actions)
+        # Apply action to WOB, RPM, MW (first 3 actions)
+        current_state_unscaled[:3] += action
 
-        # Clip scaled state to stay within [0, 1] bounds (if using MinMaxScaler) - adjust if using StandardScaler or different bounds
-        next_state_scaled_before_clip = next_state_scaled.copy() # For debug printing before clipping
-        next_state_scaled = np.clip(next_state_scaled, 0.0, 1.0)
-        print("Next Scaled State (Before Clip):", next_state_scaled_before_clip) # Debug print: Scaled state before clip
-        print("Next Scaled State (After Clip):", next_state_scaled) # Debug print: Scaled state after clip
+        # Clip the unscaled state to ensure it stays within reasonable bounds
+        current_state_unscaled = np.clip(current_state_unscaled, self.feature_scaler.data_min_, self.feature_scaler.data_max_)
 
+        # Scale the state back
+        next_state_scaled = self.feature_scaler.transform(current_state_unscaled.reshape(1, -1)).flatten()
 
         # --- 4. Unscale the Next State ---
         next_state_unscaled = self.feature_scaler.inverse_transform(next_state_scaled.reshape(1, -1)).flatten()
         next_wob, next_rpm, next_mw, next_flowrate, next_torque = next_state_unscaled # Unpack unscaled features
-        print("Next Unscaled State (WOB, RPM, MW, FlowRate, Torque):", next_wob, next_rpm, next_mw, next_flowrate, next_torque) # Debug print: Unscaled state
-
 
         # --- 5. Calculate Next ROP and BitWear ---
         # ** Placeholder: Calculate next_rop using Bourgoyne & Young's model (or your ROP formula)
@@ -89,26 +88,17 @@ class DrillingEnv(gym.Env):
         # ** Placeholder: Calculate next_bitwear using your BitWear formula
         next_bitwear = k5 * (next_wob + next_torque) - k6 * next_rop + np.random.normal(0, 0.05) # BitWear formula from user
 
-        print("Next ROP (Before Clip):", next_rop) # Debug print: ROP before clip
-        print("Next BitWear (Before Clip):", next_bitwear) # Debug print: BitWear before clip
-
         # Ensure no negative values and clip BitWear
         next_rop_clipped = np.clip(next_rop, 0, 50) # Clip ROP to a reasonable range
         next_bitwear_clipped = np.clip(next_bitwear, 0, 1) # Clip BitWear to [0, 1]
-        print("Next ROP (After Clip):", next_rop_clipped) # Debug print: ROP after clip
-        print("Next BitWear (After Clip):", next_bitwear_clipped) # Debug print: BitWear after clip
-
 
         # --- 6. Scale the Next State (for observation) ---
         next_observation = next_state_scaled # For now, next_observation is just the scaled state. You might choose to include scaled ROP/BitWear in the state later.
-
 
         # --- 3. Reward Calculation ---
         alpha = 0.1 # Scaling factor for ROP (adjust as needed)
         beta = 1.0  # Scaling factor for BitWear (adjust as needed)
         reward = alpha * next_rop_clipped - beta * next_bitwear_clipped # Reward function
-        print(f"Step Reward: {reward}")
-
 
         # --- 8. Episode Termination ---
         terminated = False # Set termination condition if needed (e.g., based on BitWear threshold)
@@ -117,9 +107,7 @@ class DrillingEnv(gym.Env):
         if self.current_step >= self.max_steps_per_episode -1: # -1 because current_step starts at 0
             truncated = True
 
-
         info = {} # Additional information (optional)
-
 
         return next_observation, reward, terminated, truncated, info
 
@@ -131,7 +119,6 @@ class DrillingEnv(gym.Env):
     def close(self):
         """Optional: Clean up resources."""
         super().close()
-
 
 # --- Example of Environment Usage ---
 if __name__ == '__main__':
