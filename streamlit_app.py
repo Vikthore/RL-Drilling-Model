@@ -30,7 +30,7 @@ st.markdown("""
         box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
     }
     .sidebar .sidebar-content {
-        background-color: #2c3e50;
+        background-color: #1e3a5f;
         color: white;
     }
     .stButton button {
@@ -47,7 +47,7 @@ st.markdown("""
 
 # --- Sidebar Navigation with Icons ---
 with st.sidebar:
-    st.image("https://upload.wikimedia.org/wikipedia/commons/6/61/Oil_rig.jpg", width=250)
+    st.image("https://www.publicdomainpictures.net/pictures/320000/velka/oil-rig-sunset.jpg", width=250)
     st.title("🌍 Navigation")
     page = st.radio("Go to", [
         "🏠 Project Overview", 
@@ -71,9 +71,21 @@ with st.sidebar:
 
 # --- Main Content Area ---
 if page == "🏠 Project Overview":
-    st.title("Reinforcement Learning for Automated Drilling Control")
-    st.image("https://miro.medium.com/max/1400/1*5VQ14OCOm2JdFYPoRZdF7g.png", use_container_width=True)
-    st.write("This dashboard provides an interactive experience for monitoring and training RL models for drilling optimization.")
+    st.title("🚀 Reinforcement Learning for Smart Drilling")
+    st.image("https://www.offshore-technology.com/wp-content/uploads/sites/13/2020/02/shutterstock_100825995.jpg", use_column_width=True)
+    st.write("""
+        Welcome to the **AI-powered Drilling Optimization Dashboard**! 🌍🛢️
+        
+        This platform provides an **interactive experience** for monitoring and training RL models 
+        to **optimize drilling performance** by maximizing **Rate of Penetration (ROP)** while minimizing **Bit Wear**.
+        
+        🔥 **Key Features:**
+        - 📊 **Monitor RL Agent Performance** with real-time updates
+        - 🎯 **Interactive Training Module** to fine-tune hyperparameters
+        - 📈 **Live Data Analysis** for drilling insights
+        - 🤖 **Compare Multiple RL Algorithms** for efficiency
+    """)
+    st.video("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
     
 elif page == "📈 Agent Performance":
     st.header("Agent Performance Evaluation")
@@ -107,37 +119,10 @@ elif page == "🛠️ Interactive Training":
                 model.save("ppo_drilling_agent")
             st.success("🎉 Training completed! Model saved.")
 
-elif page == "📊 Data Analysis":
-    st.header("📌 Data Insights")
-    uploaded_file = st.file_uploader("Upload your drilling data (CSV)", type=["csv"])
-    if uploaded_file:
-        df = pd.read_csv(uploaded_file)
-        st.write("### 📂 Data Preview")
-        st.dataframe(df.head())
-        st.write("### 📊 Statistical Summary")
-        st.write(df.describe())
-        
-        col1, col2 = st.columns(2)
-        with col1:
-            fig = px.histogram(df, x="ROP", nbins=20, labels={"ROP": "Rate of Penetration"})
-            st.plotly_chart(fig, use_container_width=True)
-        with col2:
-            fig = px.line(df, y="BitWear", labels={"BitWear": "Bit Wear"})
-            st.plotly_chart(fig, use_container_width=True)
+elif page == "📚 Resources":
+    st.header("📖 Learning Resources")
+    st.markdown("- 🔗 [Streamlit Documentation](https://docs.streamlit.io/)")
+    st.markdown("- 📚 [Stable-Baselines3 Documentation](https://stable-baselines3.readthedocs.io/en/master/)")
+    st.markdown("- 🏗️ [GitHub Repository](https://github.com/your-repo)")
 
-elif page == "🤖 Compare Agents":
-    st.header("⚖️ Compare RL Models")
-    algorithms = ["PPO", "A2C", "DDPG"]
-    selected_algorithms = st.multiselect("Select Algorithms to Compare", algorithms, default=["PPO"])
-    if st.button("🔍 Run Comparison"):
-        with st.spinner("⏳ Running comparison..."):
-            env = DrillingEnv()
-            results = {}
-            for algo in selected_algorithms:
-                model = PPO('MlpPolicy', env, verbose=1) if algo == "PPO" else A2C('MlpPolicy', env, verbose=1) if algo == "A2C" else DDPG('MlpPolicy', env, verbose=1)
-                model.learn(total_timesteps=100000)
-                results[algo] = model
-            st.write("### 📊 Comparison Results")
-            for algo, model in results.items():
-                st.write(f"#### {algo} Performance")
-                st.write(f"🏆 Average Reward: {model.episode_reward_mean}")
+st.write("🌎 Website last updated on ", st.date_input("Date", value=datetime.date.today()))
