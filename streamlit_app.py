@@ -3,6 +3,7 @@ import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import plotly.express as px
 from sklearn.preprocessing import MinMaxScaler
 from stable_baselines3 import PPO, A2C, DDPG
 from drilling_env import DrillingEnv  # Assuming your environment is in a separate file
@@ -15,10 +16,35 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# --- Custom CSS for Styling ---
+st.markdown("""
+    <style>
+    .main {
+        background-color: #f5f5f5;
+        padding: 2rem;
+    }
+    .sidebar .sidebar-content {
+        background-color: #2c3e50;
+        color: white;
+    }
+    h1, h2, h3 {
+        color: #2c3e50;
+    }
+    .stButton button {
+        background-color: #3498db;
+        color: white;
+        border-radius: 5px;
+        padding: 10px 20px;
+    }
+    .stButton button:hover {
+        background-color: #2980b9;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
 # --- User Authentication ---
 def authenticate(username, password):
     """Simple authentication function."""
-    # Replace with your actual authentication logic
     return username == "admin" and password == "password"
 
 # --- Sidebar Navigation ---
@@ -66,11 +92,8 @@ elif page == "Agent Performance":
     ep_rew_means = [125000, 130000, 138000, 142000, 144500, 145800, 146200, 146300, 146340, 146349]
 
     if training_iterations and ep_rew_means:
-        fig, ax = plt.subplots()
-        ax.plot(training_iterations, ep_rew_means)
-        ax.set_xlabel("Training Timesteps")
-        ax.set_ylabel("Episode Reward Mean")
-        st.pyplot(fig)
+        fig = px.line(x=training_iterations, y=ep_rew_means, labels={"x": "Training Timesteps", "y": "Episode Reward Mean"})
+        st.plotly_chart(fig, use_container_width=True)
     else:
         st.write("*(Training curve data not available for display.)*")
 
@@ -91,11 +114,11 @@ elif page == "Interactive Training":
             gamma = st.slider("Discount Factor (Gamma)", 0.9, 0.99, 0.99)
 
         if st.button("Start Training"):
-            st.write("Training the agent...")
-            env = DrillingEnv()
-            model = PPO('MlpPolicy', env, verbose=1, learning_rate=learning_rate, ent_coef=ent_coef, gamma=gamma)
-            model.learn(total_timesteps=total_timesteps)
-            model.save("ppo_drilling_agent")
+            with st.spinner("Training in progress..."):
+                env = DrillingEnv()
+                model = PPO('MlpPolicy', env, verbose=1, learning_rate=learning_rate, ent_coef=ent_coef, gamma=gamma)
+                model.learn(total_timesteps=total_timesteps)
+                model.save("ppo_drilling_agent")
             st.success("Training completed! Model saved.")
 
 elif page == "Data Analysis":
@@ -117,14 +140,12 @@ elif page == "Data Analysis":
         col1, col2 = st.columns(2)
         with col1:
             st.write("##### ROP Distribution")
-            fig, ax = plt.subplots()
-            ax.hist(df["ROP"], bins=20)
-            st.pyplot(fig)
+            fig = px.histogram(df, x="ROP", nbins=20, labels={"ROP": "Rate of Penetration"})
+            st.plotly_chart(fig, use_container_width=True)
         with col2:
             st.write("##### BitWear Over Time")
-            fig, ax = plt.subplots()
-            ax.plot(df["BitWear"])
-            st.pyplot(fig)
+            fig = px.line(df, y="BitWear", labels={"BitWear": "Bit Wear"})
+            st.plotly_chart(fig, use_container_width=True)
 
 elif page == "Compare Agents":
     st.header("Compare RL Agents")
@@ -134,23 +155,23 @@ elif page == "Compare Agents":
     selected_algorithms = st.multiselect("Select Algorithms to Compare", algorithms, default=["PPO"])
 
     if st.button("Run Comparison"):
-        st.write("Running comparison...")
-        env = DrillingEnv()
-        results = {}
-        for algo in selected_algorithms:
-            if algo == "PPO":
-                model = PPO('MlpPolicy', env, verbose=1)
-            elif algo == "A2C":
-                model = A2C('MlpPolicy', env, verbose=1)
-            elif algo == "DDPG":
-                model = DDPG('MlpPolicy', env, verbose=1)
-            model.learn(total_timesteps=100000)
-            results[algo] = model
+        with st.spinner("Running comparison..."):
+            env = DrillingEnv()
+            results = {}
+            for algo in selected_algorithms:
+                if algo == "PPO":
+                    model = PPO('MlpPolicy', env, verbose=1)
+                elif algo == "A2C":
+                    model = A2C('MlpPolicy', env, verbose=1)
+                elif algo == "DDPG":
+                    model = DDPG('MlpPolicy', env, verbose=1)
+                model.learn(total_timesteps=100000)
+                results[algo] = model
 
-        st.write("### Comparison Results")
-        for algo, model in results.items():
-            st.write(f"#### {algo} Performance")
-            st.write(f"Average Reward: {model.episode_reward_mean}")
+            st.write("### Comparison Results")
+            for algo, model in results.items():
+                st.write(f"#### {algo} Performance")
+                st.write(f"Average Reward: {model.episode_reward_mean}")
 
 elif page == "Resources":
     st.header("Resources")
