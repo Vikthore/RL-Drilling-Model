@@ -85,7 +85,7 @@ if page == "🏠 Project Overview":
         - 📈 **Live Data Analysis** for drilling insights
         - 🤖 **Compare Multiple RL Algorithms** for efficiency
     """)
-    st.video("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+    
     
 # --- Agent Performance Evaluation ---
 if page == "📈 Agent Performance":
