@@ -2,8 +2,8 @@ import os
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
-import gym
-from gym import spaces
+import gymnasium as gym
+from gymnasium import spaces
 
 class DrillingEnv(gym.Env):
     """Custom Environment for RL-based Drilling Optimization."""
