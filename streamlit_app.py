@@ -47,7 +47,7 @@ st.markdown("""
 
 # --- Sidebar Navigation with Icons ---
 with st.sidebar:
-    st.image("https://www.publicdomainpictures.net/pictures/320000/velka/oil-rig-sunset.jpg", width=250)
+    st.image("https://www.bing.com/images/search?view=detailV2&ccid=EOYRHDOV&id=B585EE20454715A1E391F9EB5E30FF30E4597348&thid=OIP.EOYRHDOVv6cLRegCNFA04gHaE7&mediaurl=https%3a%2f%2fmaintenanceandcure.com%2fwp-content%2fuploads%2f2019%2f05%2fexploration-and-drilling.jpg&cdnurl=https%3a%2f%2fth.bing.com%2fth%2fid%2fR.10e6111c3395bfa70b45e802345034e2%3frik%3dSHNZ5DD%252fMF7r%252bQ%26pid%3dImgRaw%26r%3d0&exph=1066&expw=1600&q=oil+rig&simid=608015805031153175&FORM=IRPRST&ck=7FB2BD814EBD39002424F63FA897522E&selectedIndex=0&itb=0", width=250)
     st.title("🌍 Navigation")
     page = st.radio("Go to", [
         "🏠 Project Overview", 
