@@ -5,3 +5,4 @@ pandas==2.2.3
 scikit-learn==1.5.1
 stable-baselines3==2.5.0
 gymnasium==1.0.0
+plotly.express==0.4.1
