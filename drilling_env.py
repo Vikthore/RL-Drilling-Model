@@ -30,8 +30,8 @@ class DrillingEnv(gym.Env):
         # --- Define State Space and Action Space ---
         # 3.1. Observation Space (State Space)
         self.observation_space = spaces.Box(
-        low=0.0, high=1.0, shape=(len(self.feature_columns),), dtype=np.float32  # <--- ADDED CLOSING PARENTHESIS AND COMMA HERE
-        )
+            low=0.0, high=1.0, shape=(len(self.feature_columns), dtype=np.float32
+        )  # Example bounds for MinMaxScaler
 
         # 3.2. Action Space
         self.action_space = spaces.Box(
