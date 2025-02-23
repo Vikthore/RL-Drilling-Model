@@ -158,9 +158,13 @@ if page == "🏠 Project Overview":
         
         action, _ = model.predict(obs, deterministic=True)
         # Ensure action is in the correct shape before inverse transformation
-        action = np.array(action).reshape(1, -1)
-        action = action[:3]
-        best_wob, best_rpm, best_mw = env.feature_scaler.inverse_transform(action)[0]  # Convert back to original scale
+        action = np.array(action).reshape(1, -1)  # Ensure proper shape
+        scaled_action = np.zeros((1, 5))  # Create a placeholder for 5 features
+        scaled_action[0, :3] = action  # Assign only the first 3 values (WOB, RPM, MW)
+
+# Apply inverse scaling to only the relevant 3 parameters
+best_wob, best_rpm, best_mw, _, _ = env.feature_scaler.inverse_transform(scaled_action)[0]
+
  # Extract only 3 parameters
     except Exception as e:
         st.error(f"Error loading {selected_agent} model: {e}")
