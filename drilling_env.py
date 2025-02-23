@@ -1,20 +1,17 @@
-import os
-import numpy as np
-import pandas as pd
-from sklearn.preprocessing import MinMaxScaler
-import gymnasium as gym
-from gymnasium import spaces
-
 class DrillingEnv(gym.Env):
     """Custom Environment for RL-based Drilling Optimization."""
 
-    metadata = {"render_modes": ["human"], "render_fps": 30}  # For visualization (optional)
+    metadata = {"render_modes": ["human"], "render_fps": 30}
 
-    def __init__(self, data_path=None):
+    def __init__(self, data_path=None, custom_df=None):
         super().__init__()
 
-        # Load dataset
-        self.df = pd.read_csv("synthetic_drilling_data.csv")
+        # Load dataset: Use uploaded dataset if provided, else default to synthetic data
+        if custom_df is not None:
+            self.df = custom_df
+        else:
+            self.df = pd.read_csv("synthetic_drilling_data.csv")
+
 
         # 1. Feature and Target Selection
         self.feature_columns = ['WOB', 'RPM', 'MW', 'FlowRate', 'Torque']  # Input features for state
