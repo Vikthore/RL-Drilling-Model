@@ -100,6 +100,7 @@ if page == "🏠 Project Overview":
 
 if page == "📈 Agent Performance":
     st.header("Agent Evaluation & Training on Custom Data")
+    st.image("julien-tromeur-FYOwBvRb2Mk-unsplash.jpg", use_container_width=True)
     st.subheader("Upload Your Dataset to Train the RL Model")
     
     uploaded_file = st.file_uploader("Upload CSV Data", type=["csv"])
