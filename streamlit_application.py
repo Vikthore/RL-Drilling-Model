@@ -314,6 +314,45 @@ if page == "📊 Data Analysis":
         scatter_fig = px.scatter(analysis_df, x=x_axis, y=y_axis, title=f"{x_axis} vs {y_axis}")
         st.plotly_chart(scatter_fig, use_container_width=True)
 
+# --- Compare Agents ---
+elif page == "🤖 Compare Agents":
+    st.header("🤖 Compare RL Agents")
+    agent_types = ["PPO", "A2C", "DDPG"]
+    mean_rewards = {}
+    episodes_compare = st.slider("Number of Episodes for Comparison", 10, 50, 20) # Slider for episodes
+
+    if st.button("🚀 Run Comparison"):
+        with st.spinner("Comparing agents..."):
+            for agent_type in agent_types:
+                if agent_type == "PPO":
+                    model = PPO.load("ppo_drilling_agent")
+                elif agent_type == "A2C":
+                    model = A2C.load("a2c_drilling_agent")
+                elif agent_type == "DDPG":
+                    model = DDPG.load("ddpg_drilling_agent")
+
+                env = DrillingEnv()
+                episodes_to_evaluate = episodes_compare # Use slider value
+                total_reward = 0
+                for episode in range(episodes_to_evaluate):
+                    obs, _ = env.reset()
+                    done = False
+                    while not done:
+                        action, _ = model.predict(obs, deterministic=True)
+                        obs, reward, terminated, truncated, _ = env.step(action)
+                        done = terminated or truncated
+                        total_reward += reward
+                mean_reward = total_reward / episodes_to_evaluate
+                mean_rewards[agent_type] = mean_reward
+                env.close()
+
+        comparison_df = pd.DataFrame(list(mean_rewards.items()), columns=['Agent', 'Mean Reward'])
+        fig = px.bar(comparison_df, x="Agent", y="Mean Reward",
+                     title="Mean Reward Comparison Across Agents")
+        st.plotly_chart(fig, use_container_width=True)
+        st.write("### Agent Comparison Results")
+        st.dataframe(comparison_df)
+        
 # --- Learning Resources ---
 elif page == "📚 Resources":
     st.header("📖 Learning Resources")
