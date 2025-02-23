@@ -157,7 +157,10 @@ if page == "🏠 Project Overview":
             raise ValueError("Invalid agent selection")
         
         action, _ = model.predict(obs, deterministic=True)
-        best_wob, best_rpm, best_mw = action  # Extract only 3 parameters
+        # Ensure action is in the correct shape before inverse transformation
+        action = np.array(action).reshape(1, -1)
+        best_wob, best_rpm, best_mw = env.feature_scaler.inverse_transform(action)[0]  # Convert back to original scale
+ # Extract only 3 parameters
     except Exception as e:
         st.error(f"Error loading {selected_agent} model: {e}")
         best_wob, best_rpm, best_mw = 0, 0, 0  # Default values in case of failure
