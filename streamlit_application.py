@@ -230,9 +230,29 @@ if page == "📈 Agent Performance":
             st.success(f"🎯 Mean Reward ({selected_agent}) over {episodes_to_evaluate} episodes: {mean_reward}")
             env.close()
 
-# --- Interactive Training ---
+#Interactive Training
 elif page == "🛠️ Interactive Training":
     st.header("🛠️ Train Your RL Model")
+    st.subheader("Customize Training Environment")
+
+    training_data_upload = st.file_uploader("Upload Training Data (CSV)", type=["csv"], key="training_uploader")
+    train_on_custom_data = st.checkbox("Train agent on uploaded data?")
+    custom_training_df = None
+
+    if train_on_custom_data:
+        if training_data_upload is not None:
+            custom_training_df = pd.read_csv(training_data_upload)
+            expected_columns_train = ["WOB", "RPM", "MW", "FlowRate", "Torque", "ROP", "Bit_Wear"] # Adjust to your CSV columns
+            if all(col in custom_training_df.columns for col in expected_columns_train):
+                st.success("✅ Training data loaded. Agent will be trained on your data.")
+                st.dataframe(custom_training_df.head()) # Display uploaded data
+            else:
+                st.error(f"Training dataset must contain columns: {expected_columns_train}. Using default training environment.")
+                custom_training_df = None # Fallback to default env
+        else:
+            st.warning("Please upload a CSV file for custom training data, or uncheck 'Train agent on uploaded data' to use default environment.")
+            custom_training_df = None # Ensure no custom data is used if no file uploaded
+
     st.subheader("Set Training Parameters")
 
     col1, col2 = st.columns(2)
@@ -245,7 +265,7 @@ elif page == "🛠️ Interactive Training":
 
     if st.button("🚀 Start Training"):
         with st.spinner("Training in progress..."):
-            env = DrillingEnv()
+            env = DrillingEnv(data_path=training_data_upload) if train_on_custom_data and custom_training_df is not None else DrillingEnv() # Use custom data if available and checkbox is checked
             if selected_agent == "PPO":
                 model = PPO("MlpPolicy", env, verbose=1, learning_rate=learning_rate, ent_coef=ent_coef, gamma=gamma)
             elif selected_agent == "A2C":
@@ -254,8 +274,14 @@ elif page == "🛠️ Interactive Training":
                 model = DDPG("MlpPolicy", env, verbose=1, learning_rate=learning_rate, ent_coef=ent_coef, gamma=gamma)
             model.learn(total_timesteps=total_timesteps)
             model.save(f"{selected_agent.lower()}_drilling_agent")
+            st.session_state["trained_model"] = model # Store trained model in session state
         st.success(f"🎉 Training completed! {selected_agent} model saved.")
-
+        st.download_button(
+            label="⬇️ Download Trained Model",
+            data=open(f"{selected_agent.lower()}_drilling_agent.zip", "rb").read(),
+            file_name=f"{selected_agent.lower()}_drilling_agent.zip",
+            mime="application/zip"
+        )
 
 # --- Data Analysis ---
 if page == "📊 Data Analysis":
