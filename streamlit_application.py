@@ -232,6 +232,7 @@ if page == "📈 Agent Performance":
 
 #Interactive Training
 elif page == "🛠️ Interactive Training":
+    st.image("interactive_training.jpg", use_container_width=True)
     st.header("🛠️ Train Your RL Model")
     st.subheader("Customize Training Environment")
 
@@ -286,6 +287,7 @@ elif page == "🛠️ Interactive Training":
 # --- Data Analysis ---
 if page == "📊 Data Analysis":
     st.header("📊 Data Analysis")
+    st.image("data_analytics.jpeg", use_container_width=True)
     st.subheader("Upload Your Dataset for Analysis")
 
     uploaded_data = st.file_uploader("Upload CSV Data", type=["csv"])
@@ -317,6 +319,7 @@ if page == "📊 Data Analysis":
 # --- Compare Agents ---
 elif page == "🤖 Compare Agents":
     st.header("🤖 Compare RL Agents")
+    st.image("group_of_robots.jpg", use_container_width=True)
     agent_types = ["PPO", "A2C", "DDPG"]
     mean_rewards = {}
     episodes_compare = st.slider("Number of Episodes for Comparison", 10, 50, 20) # Slider for episodes
@@ -356,6 +359,7 @@ elif page == "🤖 Compare Agents":
 # --- Learning Resources ---
 elif page == "📚 Resources":
     st.header("📖 Learning Resources")
+    st.image("learning_resources.jpg", use_container_width=True)
     st.markdown("- 🔗 [Streamlit Documentation](https://docs.streamlit.io/)")
     st.markdown("- 📚 [Stable-Baselines3 Documentation](https://stable-baselines3.readthedocs.io/en/master/)")
     st.markdown("- 🏗️ [GitHub Repository](https://github.com/your-repo)")
