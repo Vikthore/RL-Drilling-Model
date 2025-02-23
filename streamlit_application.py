@@ -114,6 +114,10 @@ if page == "🏠 Project Overview":
         - **Cost Reduction**: By minimizing bit wear, companies can reduce downtime and increase efficiency.
         - **Safety Improvements**: Optimized drilling processes reduce the risk of failures and environmental hazards.
 
+        ## Upload Your Dataset for Prediction
+        You can upload your own dataset with **WOB, RPM, and MW** values to make predictions using the selected RL model.
+  
+
         ## Understanding the Results
         Below, you will find the best drilling parameters as predicted by the trained RL model. These values 
         represent the optimal settings for drilling operations, helping to achieve higher efficiency and minimal bit wear.
@@ -121,52 +125,50 @@ if page == "🏠 Project Overview":
         The displayed results include:
         - **Weight on Bit (WOB)**: The optimal force applied on the drill bit.
         - **Rotations Per Minute (RPM)**: The best rotational speed for drilling efficiency.
-        - **Torque**: The ideal torque to maintain balance and prevent excessive wear.
-        - **Flow Rate**: The optimized mud flow rate for stability.
         - **Mud Weight**: The best drilling fluid weight to enhance performance.
         
         The table and bar chart provide an intuitive way to interpret these optimal values.
 
     """)
-    if "trained_model" in st.session_state:
-        env = DrillingEnv()
-        obs, _ = env.reset()
-        action, _ = st.session_state["trained_model"].predict(obs, deterministic=True)
-        best_wob, best_rpm, best_torque, best_flowrate, best_mudweight = action
-
-        parameters_df = pd.DataFrame({
-            "Parameter": ["WOB", "RPM", "Torque", "Flow Rate", "Mud Weight"],
-            "Optimal Value": [best_wob, best_rpm, best_torque, best_flowrate, best_mudweight]
-        })
-
-        st.table(parameters_df)
-
-        fig = px.bar(parameters_df, x="Parameter", y="Optimal Value", title="Optimal Drilling Parameters")
-        st.plotly_chart(fig, use_container_width=True)
-    else:
-        st.warning("No trained model available. Displaying default results from synthetic drilling data.")
-        env = DrillingEnv()
-        obs, _ = env.reset()
-        model = PPO.load("ppo_drilling_agent")  # Load default trained model
-        action, _ = model.predict(obs, deterministic=True)
+    uploaded_file = st.file_uploader("Upload Your Dataset (CSV Format)", type=["csv"])
+    if uploaded_file is not None:
+        user_data = pd.read_csv(uploaded_file)
+        expected_columns = ["WOB", "RPM", "MW"]
+        if all(col in user_data.columns for col in expected_columns):
+            st.success("✅ File uploaded successfully! Using custom dataset.")
+        else:
+            st.error(f"Uploaded dataset is missing required columns: {expected_columns}")
+            user_data = None
     
-    action = np.array(action).flatten()  # Ensure it's a 1D array
-    if len(action) != 5:
-        st.error(f"Unexpected action shape: {action.shape}. Expected 5 values.")
-        st.stop()
-    best_wob, best_rpm, best_torque, best_flowrate, best_mudweight = action
-
+    env = DrillingEnv() if user_data is None else DrillingEnv(data_path=uploaded_file)
+    obs, _ = env.reset()
+    
+    try:
+        if selected_agent == "PPO":
+            model = PPO.load("ppo_drilling_agent")
+        elif selected_agent == "A2C":
+            model = A2C.load("a2c_drilling_agent")
+        elif selected_agent == "DDPG":
+            model = DDPG.load("ddpg_drilling_agent")
+        else:
+            raise ValueError("Invalid agent selection")
+        
+        action, _ = model.predict(obs, deterministic=True)
+        best_wob, best_rpm, best_mw = action  # Extract only 3 parameters
+    except Exception as e:
+        st.error(f"Error loading {selected_agent} model: {e}")
+        best_wob, best_rpm, best_mw = 0, 0, 0  # Default values in case of failure
     
     parameters_df = pd.DataFrame({
-        "Parameter": ["WOB", "RPM", "Torque", "Flow Rate", "Mud Weight"],
-        "Optimal Value": [best_wob, best_rpm, best_torque, best_flowrate, best_mudweight]
+        "Parameter": ["WOB", "RPM", "Mud Weight"],
+        "Optimal Value": [best_wob, best_rpm, best_mw]
     })
     
+    st.subheader(f"Optimal Drilling Parameters - {selected_agent}")
     st.table(parameters_df)
     
-    fig = px.bar(parameters_df, x="Parameter", y="Optimal Value", title="Optimal Drilling Parameters")
+    fig = px.bar(parameters_df, x="Parameter", y="Optimal Value", title=f"Optimal Drilling Parameters - {selected_agent}")
     st.plotly_chart(fig, use_container_width=True)
-
 
 if page == "📈 Agent Performance":
     st.header("Agent Evaluation & Training on Custom Data")
