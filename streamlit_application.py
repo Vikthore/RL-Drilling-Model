@@ -7,12 +7,6 @@ import pandas as pd
 import plotly.express as px
 from sklearn.preprocessing import MinMaxScaler
 from stable_baselines3 import PPO, A2C, DDPG
-# --- Debugging: Check if drilling_env.py exists ---
-if os.path.exists("drilling_env.py"):
-    st.write("drilling_env.py FOUND in the same directory!") # Will display on the app if found
-else:
-    st.error("drilling_env.py NOT FOUND in the same directory!") # Will display in red if not found
-
 from drilling_env import DrillingEnv
 
 # --- Page Configuration ---
