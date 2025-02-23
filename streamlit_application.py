@@ -88,14 +88,32 @@ if page == "🏠 Project Overview":
     st.write("""
         Welcome to the **AI-powered Drilling Optimization Dashboard**! 🌍🛢️
         
-        This platform provides an **interactive experience** for monitoring and training RL models 
-        to **optimize drilling performance** by maximizing **Rate of Penetration (ROP)** while minimizing **Bit Wear**.
+       ## What is Reinforcement Learning (RL)?
+        Reinforcement Learning (RL) is a type of machine learning where an agent learns to make optimal decisions 
+        by interacting with an environment and receiving feedback in the form of rewards or penalties. 
+        RL is widely used in industries such as robotics, finance, healthcare, and **oil & gas drilling optimization**.
+        
+        ## How RL is Used in This Application
+        This platform enables users to train RL agents to optimize **Rate of Penetration (ROP)** while minimizing **Bit Wear**.
+        The trained agent can help predict the best **Weight on Bit (WOB), Rotations Per Minute (RPM), and Mud Weight (MW)** 
+        for efficient drilling operations.
         
         🔥 **Key Features:**
         - 📊 **Monitor RL Agent Performance** with real-time updates
         - 🎯 **Interactive Training Module** to fine-tune hyperparameters
         - 📈 **Live Data Analysis** for drilling insights
-        - 🤖 **Compare Multiple RL Algorithms** for efficiency
+        - 🤖 **Train on Custom Data** for personalized optimization
+        
+        ## How to Interpret Results
+        - **Episode Reward**: A higher reward indicates better drilling efficiency with lower bit wear.
+        - **Training Progress**: Shows how the RL model improves over iterations.
+        - **Agent Comparison**: Evaluate different RL algorithms (PPO, A2C, DDPG) to determine the most effective one.
+        
+        ## RL Interpretability in the Industry
+        - **Operational Decision-Making**: RL can assist drilling engineers in optimizing parameters dynamically.
+        - **Cost Reduction**: By minimizing bit wear, companies can reduce downtime and increase efficiency.
+        - **Safety Improvements**: Optimized drilling processes reduce the risk of failures and environmental hazards.
+ 
     """)
 
 if page == "📈 Agent Performance":
