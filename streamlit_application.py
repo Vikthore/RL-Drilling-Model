@@ -145,6 +145,33 @@ if page == "📈 Agent Performance":
             st.success(f"🎯 Mean Reward ({selected_agent}) over {episodes_to_evaluate} episodes: {mean_reward}")
             env.close()
 
+# --- Interactive Training ---
+if page == "🛠️ Interactive Training":
+    st.header("🛠️ Train Your RL Model")
+    st.subheader("Set Training Parameters")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        learning_rate = st.slider("Learning Rate", 0.00001, 0.001, 0.0001)
+        gamma = st.slider("Discount Factor (Gamma)", 0.9, 0.99, 0.99)
+    with col2:
+        total_timesteps = st.slider("Total Timesteps", 10000, 1000000, 100000)
+        ent_coef = st.slider("Entropy Coefficient", 0.0, 0.2, 0.01)
+    
+    if st.button("🚀 Start Training"):
+        with st.spinner("Training in progress..."):
+            env = DrillingEnv()
+            if selected_agent == "PPO":
+                model = PPO("MlpPolicy", env, verbose=1, learning_rate=learning_rate, ent_coef=ent_coef, gamma=gamma)
+            elif selected_agent == "A2C":
+                model = A2C("MlpPolicy", env, verbose=1, learning_rate=learning_rate, ent_coef=ent_coef, gamma=gamma)
+            elif selected_agent == "DDPG":
+                model = DDPG("MlpPolicy", env, verbose=1, learning_rate=learning_rate, ent_coef=ent_coef, gamma=gamma)
+            model.learn(total_timesteps=total_timesteps)
+            model.save(f"{selected_agent.lower()}_drilling_agent")
+        st.success(f"🎉 Training completed! {selected_agent} model saved.")
+
+
 # --- Data Analysis ---
 if page == "📊 Data Analysis":
     st.header("📊 Data Analysis")
