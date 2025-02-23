@@ -1,3 +1,11 @@
+import os
+import numpy as np
+import pandas as pd
+from sklearn.preprocessing import MinMaxScaler
+import gymnasium as gym
+from gymnasium import spaces
+from stable_baselines3 import PPO, A2C, DDPG
+
 class DrillingEnv(gym.Env):
     """Custom Environment for RL-based Drilling Optimization."""
 
