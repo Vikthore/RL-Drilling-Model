@@ -131,6 +131,8 @@ if page == "🏠 Project Overview":
 
     """)
     uploaded_file = st.file_uploader("Upload Your Dataset (CSV Format)", type=["csv"])
+    user_data = None
+    
     if uploaded_file is not None:
         user_data = pd.read_csv(uploaded_file)
         expected_columns = ["WOB", "RPM", "MW"]
@@ -140,8 +142,9 @@ if page == "🏠 Project Overview":
             st.error(f"Uploaded dataset is missing required columns: {expected_columns}")
             user_data = None
     
-    env = DrillingEnv() if user_data is None else DrillingEnv(data_path=uploaded_file.name)
+    env = DrillingEnv() if user_data is None else DrillingEnv(data_path=uploaded_file)
     obs, _ = env.reset()
+    
     
     try:
         if selected_agent == "PPO":
