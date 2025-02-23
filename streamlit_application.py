@@ -144,42 +144,36 @@ if page == "📈 Agent Performance":
             st.success(f"🎯 Mean Reward ({selected_agent}) over {episodes_to_evaluate} episodes: {mean_reward}")
             env.close()
 
-# --- Data Analysis Section ---
-elif page == "📊 Data Analysis":
+# --- Data Analysis ---
+if page == "📊 Data Analysis":
     st.header("📊 Data Analysis")
-    st.subheader("Explore and Analyze Drilling Data")
+    st.subheader("Upload Your Dataset for Analysis")
     
-    df = pd.read_csv("synthetic_drilling_data.csv")
+    uploaded_data = st.file_uploader("Upload CSV Data", type=["csv"])
+    if uploaded_data is not None:
+        analysis_df = pd.read_csv(uploaded_data)
+        st.write("### Uploaded Dataset Preview")
+        st.dataframe(analysis_df.head())
+    else:
+        analysis_df = pd.read_csv("synthetic_drilling_data.csv")
+        st.write("### Default Dataset: Synthetic Drilling Data")
+        st.dataframe(analysis_df.head())
     
-    st.write("### Dataset Preview")
-    st.dataframe(df.head())
-    
-    st.write("### Descriptive Statistics")
-    st.write(df.describe())
-    
-    st.write("### Interactive Visualizations")
-    col1, col2 = st.columns(2)
-    with col1:
-        x_axis = st.selectbox("Select X-axis", df.columns)
-    with col2:
-        y_axis = st.selectbox("Select Y-axis", df.columns)
-    
-    fig = px.scatter(df, x=x_axis, y=y_axis, title=f"{x_axis} vs {y_axis}")
-    st.plotly_chart(fig, use_container_width=True)
-    
-    st.write("### Correlation Heatmap")
-    numeric_df = df.select_dtypes(include=[np.number])
-    corr = numeric_df.corr()
-    fig = px.imshow(corr, text_auto=True, title="Correlation Matrix")
-    st.plotly_chart(fig, use_container_width=True)
-    
-    st.write("### Download Analysis Results")
-    st.download_button(
-        label="Download Dataset as CSV",
-        data=df.to_csv(index=False),
-        file_name="drilling_data_analysis.csv",
-        mime="text/csv"
-    )
+    if analysis_df is not None:
+        st.subheader("Dataset Statistics")
+        st.write(analysis_df.describe())
+        
+        st.subheader("Correlation Heatmap")
+        numeric_df = analysis_df.select_dtypes(include=[np.number])
+        corr = numeric_df.corr()
+        fig = px.imshow(corr, text_auto=True, title="Correlation Matrix")
+        st.plotly_chart(fig, use_container_width=True)
+        
+        st.subheader("Interactive Scatter Plot")
+        x_axis = st.selectbox("Select X-axis", analysis_df.columns)
+        y_axis = st.selectbox("Select Y-axis", analysis_df.columns)
+        scatter_fig = px.scatter(analysis_df, x=x_axis, y=y_axis, title=f"{x_axis} vs {y_axis}")
+        st.plotly_chart(scatter_fig, use_container_width=True)
 
 # --- Learning Resources ---
 elif page == "📚 Resources":
