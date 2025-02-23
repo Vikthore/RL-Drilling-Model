@@ -232,7 +232,7 @@ if page == "📈 Agent Performance":
 
 #Interactive Training
 elif page == "🛠️ Interactive Training":
-    st.image("interactive_training.jpg", use_container_width=True)
+    st.image("possessed-photography-YKW0JjP7rlU-unsplash.jpg", use_container_width=True)
     st.header("🛠️ Train Your RL Model")
     st.subheader("Customize Training Environment")
 
@@ -359,7 +359,7 @@ elif page == "🤖 Compare Agents":
 # --- Learning Resources ---
 elif page == "📚 Resources":
     st.header("📖 Learning Resources")
-    st.image("learning_resources.jpg", use_container_width=True)
+    st.image("altumcode-oZ61KFUQsus-unsplash.jpg", use_container_width=True)
     st.markdown("- 🔗 [Streamlit Documentation](https://docs.streamlit.io/)")
     st.markdown("- 📚 [Stable-Baselines3 Documentation](https://stable-baselines3.readthedocs.io/en/master/)")
     st.markdown("- 🏗️ [GitHub Repository](https://github.com/your-repo)")
