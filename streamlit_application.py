@@ -114,6 +114,19 @@ if page == "🏠 Project Overview":
         - **Cost Reduction**: By minimizing bit wear, companies can reduce downtime and increase efficiency.
         - **Safety Improvements**: Optimized drilling processes reduce the risk of failures and environmental hazards.
 
+        ## Understanding the Results
+        Below, you will find the best drilling parameters as predicted by the trained RL model. These values 
+        represent the optimal settings for drilling operations, helping to achieve higher efficiency and minimal bit wear.
+
+        The displayed results include:
+        - **Weight on Bit (WOB)**: The optimal force applied on the drill bit.
+        - **Rotations Per Minute (RPM)**: The best rotational speed for drilling efficiency.
+        - **Torque**: The ideal torque to maintain balance and prevent excessive wear.
+        - **Flow Rate**: The optimized mud flow rate for stability.
+        - **Mud Weight**: The best drilling fluid weight to enhance performance.
+        
+        The table and bar chart provide an intuitive way to interpret these optimal values.
+
     """)
     if "trained_model" in st.session_state:
         env = DrillingEnv()
@@ -131,7 +144,23 @@ if page == "🏠 Project Overview":
         fig = px.bar(parameters_df, x="Parameter", y="Optimal Value", title="Optimal Drilling Parameters")
         st.plotly_chart(fig, use_container_width=True)
     else:
-        st.warning("No trained model available. Please train an agent in the Interactive Training section.")
+        st.warning("No trained model available. Displaying default results from synthetic drilling data.")
+        env = DrillingEnv()
+        obs, _ = env.reset()
+        model = PPO.load("ppo_drilling_agent")  # Load default trained model
+        action, _ = model.predict(obs, deterministic=True)
+    
+    best_wob, best_rpm, best_torque, best_flowrate, best_mudweight = action
+    
+    parameters_df = pd.DataFrame({
+        "Parameter": ["WOB", "RPM", "Torque", "Flow Rate", "Mud Weight"],
+        "Optimal Value": [best_wob, best_rpm, best_torque, best_flowrate, best_mudweight]
+    })
+    
+    st.table(parameters_df)
+    
+    fig = px.bar(parameters_df, x="Parameter", y="Optimal Value", title="Optimal Drilling Parameters")
+    st.plotly_chart(fig, use_container_width=True)
 
 
 if page == "📈 Agent Performance":
