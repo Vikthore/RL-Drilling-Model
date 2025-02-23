@@ -115,6 +115,24 @@ if page == "🏠 Project Overview":
         - **Safety Improvements**: Optimized drilling processes reduce the risk of failures and environmental hazards.
  
     """)
+     if "trained_model" in st.session_state:
+        env = DrillingEnv()
+        obs, _ = env.reset()
+        action, _ = st.session_state["trained_model"].predict(obs, deterministic=True)
+        best_wob, best_rpm, best_torque, best_flowrate, best_mudweight = action
+        
+        parameters_df = pd.DataFrame({
+            "Parameter": ["WOB", "RPM", "Torque", "Flow Rate", "Mud Weight"],
+            "Optimal Value": [best_wob, best_rpm, best_torque, best_flowrate, best_mudweight]
+        })
+        
+        st.table(parameters_df)
+        
+        fig = px.bar(parameters_df, x="Parameter", y="Optimal Value", title="Optimal Drilling Parameters")
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.warning("No trained model available. Please train an agent in the Interactive Training section.")
+
 
 if page == "📈 Agent Performance":
     st.header("Agent Evaluation & Training on Custom Data")
