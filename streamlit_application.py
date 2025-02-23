@@ -107,7 +107,7 @@ if page == "📈 Agent Performance":
         with st.spinner(f"Evaluating {selected_agent} agent..."):
             model = None
             if selected_agent == "PPO":
-                model = PPO.load("ppo_drilling_agent")
+                model = PPO.load("ppo_drilling_agents")
             elif selected_agent == "A2C":
                 model = A2C.load("a2c_drilling_agent")
             elif selected_agent == "DDPG":
