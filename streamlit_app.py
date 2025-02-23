@@ -6,7 +6,7 @@ import pandas as pd
 import plotly.express as px
 from sklearn.preprocessing import MinMaxScaler
 from stable_baselines3 import PPO, A2C, DDPG
-from .drilling_env import DrillingEnv
+from drilling_env import DrillingEnv
 
 # --- Page Configuration ---
 st.set_page_config(
