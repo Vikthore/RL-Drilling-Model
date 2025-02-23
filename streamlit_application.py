@@ -55,7 +55,7 @@ st.markdown("""
 
 # --- Sidebar Navigation with Icons ---
 with st.sidebar:
-    st.image("oil_rig.jpeg", width=250)
+    st.image("tricone_bit.jpeg", width=250)
     st.title("🌍 Navigation")
     page = st.radio("Go to", [
         "🏠 Project Overview", 
