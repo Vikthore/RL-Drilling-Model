@@ -140,7 +140,7 @@ if page == "🏠 Project Overview":
             st.error(f"Uploaded dataset is missing required columns: {expected_columns}")
             user_data = None
     
-    env = DrillingEnv() if user_data is None else DrillingEnv(data_path=uploaded_file)
+    env = DrillingEnv() if user_data is None else DrillingEnv(data_path=uploaded_file.name)
     obs, _ = env.reset()
     
     try:
