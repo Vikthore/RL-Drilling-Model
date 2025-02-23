@@ -43,6 +43,13 @@ st.markdown("""
     .stButton button:hover {
         background-color: #c0392b;
     }
+    .stDataFrame {
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+    }
+    .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
+        color: #1e3a5f;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -142,6 +149,47 @@ elif page == "🛠️ Interactive Training":
                 model.learn(total_timesteps=total_timesteps)
                 model.save("ppo_drilling_agent")
             st.success("🎉 Training completed! Model saved.")
+
+elif page == "📊 Data Analysis":
+    st.header("📊 Data Analysis")
+    st.subheader("Explore and Analyze Drilling Data")
+
+    # Load dataset
+    df = pd.read_csv("synthetic_drilling_data.csv")
+
+    # Display dataset
+    st.write("### Dataset Preview")
+    st.dataframe(df.head())
+
+    # Descriptive Statistics
+    st.write("### Descriptive Statistics")
+    st.write(df.describe())
+
+    # Interactive Visualizations
+    st.write("### Interactive Visualizations")
+    col1, col2 = st.columns(2)
+    with col1:
+        x_axis = st.selectbox("Select X-axis", df.columns)
+    with col2:
+        y_axis = st.selectbox("Select Y-axis", df.columns)
+
+    fig = px.scatter(df, x=x_axis, y=y_axis, title=f"{x_axis} vs {y_axis}")
+    st.plotly_chart(fig, use_container_width=True)
+
+    # Correlation Heatmap
+    st.write("### Correlation Heatmap")
+    corr = df.corr()
+    fig = px.imshow(corr, text_auto=True, title="Correlation Matrix")
+    st.plotly_chart(fig, use_container_width=True)
+
+    # Download Analysis Results
+    st.write("### Download Analysis Results")
+    st.download_button(
+        label="Download Dataset as CSV",
+        data=df.to_csv(index=False),
+        file_name="drilling_data_analysis.csv",
+        mime="text/csv"
+    )
 
 elif page == "📚 Resources":
     st.header("📖 Learning Resources")
