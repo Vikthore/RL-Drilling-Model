@@ -150,7 +150,12 @@ if page == "🏠 Project Overview":
         model = PPO.load("ppo_drilling_agent")  # Load default trained model
         action, _ = model.predict(obs, deterministic=True)
     
+    action = np.array(action).flatten()  # Ensure it's a 1D array
+    if len(action) != 5:
+        st.error(f"Unexpected action shape: {action.shape}. Expected 5 values.")
+        st.stop()
     best_wob, best_rpm, best_torque, best_flowrate, best_mudweight = action
+
     
     parameters_df = pd.DataFrame({
         "Parameter": ["WOB", "RPM", "Torque", "Flow Rate", "Mud Weight"],
