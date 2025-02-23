@@ -66,6 +66,10 @@ with st.sidebar:
         "📚 Resources"
     ])
     
+    # Agent Selection
+    st.header("🤖 Agent Selection")
+    selected_agent = st.selectbox("Choose Agent", ["PPO", "A2C", "DDPG"])
+
     # User Authentication
     st.header("🔐 Login")
     username = st.text_input("Username")
@@ -93,16 +97,25 @@ if page == "🏠 Project Overview":
         - 📈 **Live Data Analysis** for drilling insights
         - 🤖 **Compare Multiple RL Algorithms** for efficiency
     """)
-    
-    
+
 # --- Agent Performance Evaluation ---
 if page == "📈 Agent Performance":
     st.header("Agent Performance Evaluation")
     st.subheader("Evaluate Trained RL Agent")
     
     if st.button("🚀 Run Evaluation"):
-        with st.spinner("Evaluating the agent..."):
-            model = PPO.load("ppo_drilling_agent")
+        with st.spinner(f"Evaluating {selected_agent} agent..."):
+            model = None
+            if selected_agent == "PPO":
+                model = PPO.load("ppo_drilling_agent")
+            elif selected_agent == "A2C":
+                model = A2C.load("a2c_drilling_agent")
+            elif selected_agent == "DDPG":
+                model = DDPG.load("ddpg_drilling_agent")
+            else:
+                st.error("Invalid agent selected.")
+                st.stop()
+            
             env = DrillingEnv()
             episodes_to_evaluate = 10
             mean_reward = 0
@@ -113,76 +126,45 @@ if page == "📈 Agent Performance":
                 episode_reward = 0
                 while not done:
                     action, _ = model.predict(obs, deterministic=True)
-                    obs, reward, terminated, truncated, info = env.step(action)
+                    obs, reward, terminated, truncated, _ = env.step(action)
                     done = terminated or truncated
                     episode_reward += reward
                 mean_reward += episode_reward
                 st.write(f"Episode {episode+1} Reward: {episode_reward}")
             
             mean_reward /= episodes_to_evaluate
-            st.success(f"🎯 Mean Reward over {episodes_to_evaluate} episodes: {mean_reward}")
+            st.success(f"🎯 Mean Reward ({selected_agent}) over {episodes_to_evaluate} episodes: {mean_reward}")
             env.close()
 
-    st.subheader("Training Progress")
-    training_iterations = np.linspace(10000, 100000, 10).astype(int)
-    ep_rew_means = np.linspace(125000, 146349, 10).astype(int)
-    fig = px.line(x=training_iterations, y=ep_rew_means, labels={"x": "Training Timesteps", "y": "Episode Reward Mean"}, title="Training Progress")
-    st.plotly_chart(fig, use_container_width=True)
-
-elif page == "🛠️ Interactive Training":
-    if not st.session_state.get("authenticated", False):
-        st.warning("🔐 Please log in to access this feature.")
-    else:
-        st.header("🎯 Train Your RL Model")
-        col1, col2 = st.columns(2)
-        with col1:
-            learning_rate = st.slider("Learning Rate", 0.00001, 0.001, 0.0001)
-            ent_coef = st.slider("Entropy Coefficient", 0.0, 0.2, 0.01)
-        with col2:
-            total_timesteps = st.slider("Total Timesteps", 10000, 1000000, 100000)
-            gamma = st.slider("Discount Factor (Gamma)", 0.9, 0.99, 0.99)
-        
-        if st.button("🚀 Start Training"):
-            with st.spinner("⏳ Training in progress..."):
-                env = DrillingEnv()
-                model = PPO('MlpPolicy', env, verbose=1, learning_rate=learning_rate, ent_coef=ent_coef, gamma=gamma)
-                model.learn(total_timesteps=total_timesteps)
-                model.save("ppo_drilling_agent")
-            st.success("🎉 Training completed! Model saved.")
-
+# --- Data Analysis Section ---
 elif page == "📊 Data Analysis":
     st.header("📊 Data Analysis")
     st.subheader("Explore and Analyze Drilling Data")
-
-    # Load dataset
+    
     df = pd.read_csv("synthetic_drilling_data.csv")
-
-    # Display dataset
+    
     st.write("### Dataset Preview")
     st.dataframe(df.head())
-
-    # Descriptive Statistics
+    
     st.write("### Descriptive Statistics")
     st.write(df.describe())
-
-    # Interactive Visualizations
+    
     st.write("### Interactive Visualizations")
     col1, col2 = st.columns(2)
     with col1:
         x_axis = st.selectbox("Select X-axis", df.columns)
     with col2:
         y_axis = st.selectbox("Select Y-axis", df.columns)
-
+    
     fig = px.scatter(df, x=x_axis, y=y_axis, title=f"{x_axis} vs {y_axis}")
     st.plotly_chart(fig, use_container_width=True)
-
-    # Correlation Heatmap
+    
     st.write("### Correlation Heatmap")
-    corr = df.corr()
+    numeric_df = df.select_dtypes(include=[np.number])
+    corr = numeric_df.corr()
     fig = px.imshow(corr, text_auto=True, title="Correlation Matrix")
     st.plotly_chart(fig, use_container_width=True)
-
-    # Download Analysis Results
+    
     st.write("### Download Analysis Results")
     st.download_button(
         label="Download Dataset as CSV",
@@ -191,10 +173,11 @@ elif page == "📊 Data Analysis":
         mime="text/csv"
     )
 
+# --- Learning Resources ---
 elif page == "📚 Resources":
     st.header("📖 Learning Resources")
     st.markdown("- 🔗 [Streamlit Documentation](https://docs.streamlit.io/)")
     st.markdown("- 📚 [Stable-Baselines3 Documentation](https://stable-baselines3.readthedocs.io/en/master/)")
     st.markdown("- 🏗️ [GitHub Repository](https://github.com/your-repo)")
 
-st.write("🌎 Website last updated on ", st.date_input("Date", value=datetime.date.today()))
+st.write("🌎 Website last updated on ", datetime.date.today())
