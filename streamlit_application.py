@@ -98,9 +98,17 @@ if page == "🏠 Project Overview":
         - 🤖 **Compare Multiple RL Algorithms** for efficiency
     """)
 
-# --- Agent Performance Evaluation ---
 if page == "📈 Agent Performance":
-    st.header("Agent Performance Evaluation")
+    st.header("Agent Evaluation & Training on Custom Data")
+    st.subheader("Upload Your Dataset to Train the RL Model")
+    
+    uploaded_file = st.file_uploader("Upload CSV Data", type=["csv"])
+    custom_df = None
+    if uploaded_file is not None:
+        custom_df = pd.read_csv(uploaded_file)
+        st.write("### Uploaded Dataset Preview")
+        st.dataframe(custom_df.head())
+    
     st.subheader("Evaluate Trained RL Agent")
     
     if st.button("🚀 Run Evaluation"):
@@ -116,7 +124,7 @@ if page == "📈 Agent Performance":
                 st.error("Invalid agent selected.")
                 st.stop()
             
-            env = DrillingEnv()
+            env = DrillingEnv(custom_df=custom_df) if custom_df is not None else DrillingEnv()
             episodes_to_evaluate = 10
             mean_reward = 0
             
