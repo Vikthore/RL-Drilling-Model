@@ -161,29 +161,17 @@ if page == "🏠 Project Overview":
         # Ensure action is properly shaped
         # Ensure action is in the expected range before inverse transformation
         # Ensure action is a NumPy array and correctly shaped
-        action = np.array(action).reshape(1, -1)
+        # Extract Min/Max WOB values
+        wob_min = env.feature_scaler.data_min_[0]
+        wob_max = env.feature_scaler.data_max_[0]
         
-        # Rescale model output from [-0.1, 0.1] to [0,1]
-        scaled_action = (action + 0.1) / 0.2  
+        # Manually rescale WOB from model output (-0.1, 0.1) to (wob_min, wob_max)
+        best_wob = wob_min + (action[0][0] + 0.1) * (wob_max - wob_min) / 0.2
+        best_rpm = wob_min + (action[0][1] + 0.1) * (env.feature_scaler.data_max_[1] - env.feature_scaler.data_min_[1]) / 0.2
+        best_mw = wob_min + (action[0][2] + 0.1) * (env.feature_scaler.data_max_[2] - env.feature_scaler.data_min_[2]) / 0.2
         
-        # Create a placeholder for 5 input features (since MinMaxScaler was trained on 5)
-        full_scaled_action = np.zeros((1, 5))  
-        full_scaled_action[0, :3] = scaled_action  # Assign only WOB, RPM, MW
         
-        # Apply inverse transformation to get original scale values
-        inverse_transformed = env.feature_scaler.inverse_transform(full_scaled_action)[0]
-        
-        # Extract WOB, RPM, MW
-        best_wob = np.clip(inverse_transformed[0], env.feature_scaler.data_min_[0], env.feature_scaler.data_max_[0])
-        best_rpm = np.clip(inverse_transformed[1], env.feature_scaler.data_min_[1], env.feature_scaler.data_max_[1])
-        best_mw = np.clip(inverse_transformed[2], env.feature_scaler.data_min_[2], env.feature_scaler.data_max_[2])
-        
-        # Debugging
-        st.write(f"Scaled Action: {scaled_action}")
-        st.write(f"Inverse Transformed WOB: {best_wob}, RPM: {best_rpm}, MW: {best_mw}")
-        
-
-        
+                
 
  # Extract only 3 parameters
     except Exception as e:
