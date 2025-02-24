@@ -158,14 +158,20 @@ if page == "🏠 Project Overview":
         
         action, _ = model.predict(obs, deterministic=True)
         # Ensure action is a NumPy array and reshape for compatibility
+        # Ensure action is properly shaped
         action = np.array(action).reshape(1, -1)
         
-        # Create a placeholder for 5 features (since MinMaxScaler was trained on 5)
+        # Create a placeholder for 5 features (since MinMaxScaler was trained on 5 inputs)
         scaled_action = np.zeros((1, 5))  
         scaled_action[0, :3] = action  # Assign only WOB, RPM, MW
         
-        # Apply inverse transformation only to the relevant 3 parameters
-        best_wob, best_rpm, best_mw = env.feature_scaler.inverse_transform(scaled_action)[0][:3]
+        # Apply inverse transformation to get original values
+        inverse_transformed = env.feature_scaler.inverse_transform(scaled_action)[0]
+        
+        # Assign corrected values
+        best_wob = np.clip(inverse_transformed[0], env.feature_scaler.data_min_[0], env.feature_scaler.data_max_[0])
+        best_rpm = inverse_transformed[1]
+        best_mw = inverse_transformed[2]
 
  # Extract only 3 parameters
     except Exception as e:
