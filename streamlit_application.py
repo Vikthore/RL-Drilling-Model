@@ -171,10 +171,10 @@ if page == "🏠 Project Overview":
         mw_min, mw_max = env.feature_scaler.data_min_[2], env.feature_scaler.data_max_[2]
         
         # Ensure the model's output (-0.1 to 0.1) fully explores the range
-        best_wob = np.clip(wob_min + ((action[0] + 0.2) / 0.3) * (wob_max - wob_min), wob_min, wob_max)
-        best_rpm = np.clip(rpm_min + ((action[1] + 0.2) / 0.3) * (rpm_max - rpm_min), rpm_min, rpm_max)
-        best_mw = np.clip(mw_min + ((action[2] + 0.2) / 0.3) * (mw_max - mw_min), mw_min, mw_max)
-        
+        best_wob = np.clip(wob_min + ((action[0] + 0.1) / 0.15) * (wob_max - wob_min), wob_min, wob_max)
+        best_rpm = np.clip(rpm_min + ((action[1] + 0.1) / 0.15) * (rpm_max - rpm_min), rpm_min, rpm_max)
+        best_mw = np.clip(mw_min + ((action[2] + 0.1) / 0.15) * (mw_max - mw_min), mw_min, mw_max)
+
                 
                 
 
