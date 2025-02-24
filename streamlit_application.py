@@ -159,22 +159,24 @@ if page == "🏠 Project Overview":
         action, _ = model.predict(obs, deterministic=True)
         # Ensure action is a NumPy array and reshape for compatibility
         # Ensure action is properly shaped
+        # Ensure action is in the expected range before inverse transformation
         action = np.array(action).reshape(1, -1)
         
-        # Create a placeholder for 5 features (since MinMaxScaler was trained on 5 inputs)
-        scaled_action = np.zeros((1, 5))  
-        scaled_action[0, :3] = action  # Assign only WOB, RPM, MW
+        # Rescale action from [-0.1, 0.1] to [0,1] for MinMaxScaler
+        scaled_action = (action + 0.1) / 0.2  
+        
+        # Create a 5-feature placeholder
+        full_scaled_action = np.zeros((1, 5))  
+        full_scaled_action[0, :3] = scaled_action  # Assign only WOB, RPM, MW
         
         # Apply inverse transformation to get original values
-        inverse_transformed = env.feature_scaler.inverse_transform(scaled_action)[0]
+        inverse_transformed = env.feature_scaler.inverse_transform(full_scaled_action)[0]
         
-        # Assign corrected values
-        best_wob = np.clip(inverse_transformed[0], env.feature_scaler.data_min_[0], env.feature_scaler.data_max_[0])
+        # Extract WOB, RPM, MW
+        best_wob = inverse_transformed[0]
         best_rpm = inverse_transformed[1]
         best_mw = inverse_transformed[2]
-        st.write(f"Original WOB Min: {env.feature_scaler.data_min_[0]}, Max: {env.feature_scaler.data_max_[0]}")
-        st.write(f"Predicted Scaled WOB: {action[0]}")
-        st.write(f"Inverse Transformed WOB: {best_wob}")
+
         
 
  # Extract only 3 parameters
