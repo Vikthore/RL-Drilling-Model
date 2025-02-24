@@ -157,8 +157,7 @@ if page == "🏠 Project Overview":
             raise ValueError("Invalid agent selection")
         
         action, _ = model.predict(obs, deterministic=True)
-        st.write(f"Raw Action Output from Model: {action}")
-
+        
         # Ensure action is a NumPy array and reshape for compatibility
         # Ensure action is properly shaped
         # Ensure action is in the expected range before inverse transformation
