@@ -172,6 +172,10 @@ if page == "🏠 Project Overview":
         best_wob = np.clip(inverse_transformed[0], env.feature_scaler.data_min_[0], env.feature_scaler.data_max_[0])
         best_rpm = inverse_transformed[1]
         best_mw = inverse_transformed[2]
+        st.write(f"Original WOB Min: {env.feature_scaler.data_min_[0]}, Max: {env.feature_scaler.data_max_[0]}")
+        st.write(f"Predicted Scaled WOB: {action[0]}")
+        st.write(f"Inverse Transformed WOB: {best_wob}")
+        
 
  # Extract only 3 parameters
     except Exception as e:
