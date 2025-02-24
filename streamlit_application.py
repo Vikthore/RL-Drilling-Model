@@ -157,22 +157,25 @@ if page == "🏠 Project Overview":
             raise ValueError("Invalid agent selection")
         
         action, _ = model.predict(obs, deterministic=True)
+        st.write(f"Raw Action Output from Model: {action}")
+
         # Ensure action is a NumPy array and reshape for compatibility
         # Ensure action is properly shaped
         # Ensure action is in the expected range before inverse transformation
         # Ensure action is a NumPy array and correctly shaped
         # Extract Min/Max WOB values
         # Extract Min/Max values for WOB, RPM, MW
+        # Extract min/max values for WOB, RPM, MW
         wob_min, wob_max = env.feature_scaler.data_min_[0], env.feature_scaler.data_max_[0]
         rpm_min, rpm_max = env.feature_scaler.data_min_[1], env.feature_scaler.data_max_[1]
         mw_min, mw_max = env.feature_scaler.data_min_[2], env.feature_scaler.data_max_[2]
         
-        # Manually rescale WOB, RPM, MW from model output (-0.1, 0.1) to their actual ranges
-        best_wob = wob_min + (action[0] + 0.1) * (wob_max - wob_min) / 0.2
-        best_rpm = rpm_min + (action[1] + 0.1) * (rpm_max - rpm_min) / 0.2
-        best_mw = mw_min + (action[2] + 0.1) * (mw_max - mw_min) / 0.2
-
+        # Ensure the model's output (-0.1 to 0.1) fully explores the range
+        best_wob = np.clip(wob_min + ((action[0] + 0.2) / 0.3) * (wob_max - wob_min), wob_min, wob_max)
+        best_rpm = np.clip(rpm_min + ((action[1] + 0.2) / 0.3) * (rpm_max - rpm_min), rpm_min, rpm_max)
+        best_mw = np.clip(mw_min + ((action[2] + 0.2) / 0.3) * (mw_max - mw_min), mw_min, mw_max)
         
+                
                 
 
  # Extract only 3 parameters
