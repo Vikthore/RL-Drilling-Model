@@ -162,14 +162,10 @@ if page == "🏠 Project Overview":
         # Ensure action is in the expected range before inverse transformation
         # Ensure action is a NumPy array and correctly shaped
         # Extract Min/Max WOB values
-        wob_min = env.feature_scaler.data_min_[0]
-        wob_max = env.feature_scaler.data_max_[0]
-        
-        # Manually rescale WOB from model output (-0.1, 0.1) to (wob_min, wob_max)
-        best_wob = wob_min + (action[0][0] + 0.1) * (wob_max - wob_min) / 0.2
-        best_rpm = wob_min + (action[0][1] + 0.1) * (env.feature_scaler.data_max_[1] - env.feature_scaler.data_min_[1]) / 0.2
-        best_mw = wob_min + (action[0][2] + 0.1) * (env.feature_scaler.data_max_[2] - env.feature_scaler.data_min_[2]) / 0.2
-        
+        best_wob = wob_min + (action[0] + 0.1) * (wob_max - wob_min) / 0.2
+        best_rpm = env.feature_scaler.data_min_[1] + (action[1] + 0.1) * (env.feature_scaler.data_max_[1] - env.feature_scaler.data_min_[1]) / 0.2
+        best_mw = env.feature_scaler.data_min_[2] + (action[2] + 0.1) * (env.feature_scaler.data_max_[2] - env.feature_scaler.data_min_[2]) / 0.2
+
         
                 
 
