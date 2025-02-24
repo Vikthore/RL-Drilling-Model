@@ -163,7 +163,7 @@ if page == "🏠 Project Overview":
         action = np.array(action).reshape(1, -1)
         
         # Rescale action from [-0.1, 0.1] to [0,1] for MinMaxScaler
-        scaled_action = (action + 0.1) / 0.2  
+        scaled_action = (action + 0.1) / 0.15  
         
         # Create a 5-feature placeholder
         full_scaled_action = np.zeros((1, 5))  
